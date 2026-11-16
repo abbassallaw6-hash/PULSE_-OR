@@ -1,1 +1,191 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101c30">
+<title>PULSE OR | Design Pulse</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f5fa;color:#17243a;font-family:Arial,sans-serif}
+header{background:#101c30;color:white;padding:24px 20px;border-radius:0 0 25px 25px}
+header h1{margin:0;font-size:27px;letter-spacing:2px}
+header p{color:#8fa8c7;font-size:12px}
+main{padding:18px;max-width:700px;margin:auto}
+h2{font-size:19px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:white;border-radius:15px;padding:17px;box-shadow:0 3px 15px #17243a0a}
+.card small{color:#718096}
+.number{font-size:27px;font-weight:bold;color:#078eaa;margin-top:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+button{border:0;border-radius:11px;padding:14px;background:#078eaa;color:white;font-weight:bold;cursor:pointer}
+button.secondary{background:#e1f3f6;color:#087f98}
+input,select{width:100%;padding:13px;margin:7px 0 14px;border:1px solid #dce3ed;border-radius:10px;background:white}
+.panel{display:none;background:white;padding:17px;border-radius:15px;margin-top:15px}
+.panel.active{display:block}
+.patient,.operation{padding:12px 0;border-bottom:1px solid #edf0f5;font-size:14px}
+nav{display:flex;gap:8px;overflow:auto;padding:10px 0}
+nav button{white-space:nowrap;padding:11px}
+footer{text-align:center;color:#8290a3;font-size:11px;padding:25px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>PULSE OR</h1>
+<p>OPERATING ROOM MANAGEMENT SYSTEM</p>
+<p>BY DESIGN PULSE</p>
+</header>
+
+<main>
+<h2>Dashboard</h2>
+
+<div class="stats">
+<div class="card"><small>Total Patients</small><div class="number" id="pc">0</div></div>
+<div class="card"><small>Total Operations</small><div class="number" id="oc">0</div></div>
+<div class="card"><small>Surgeons</small><div class="number">0</div></div>
+<div class="card"><small>OR Rooms</small><div class="number">0</div></div>
+</div>
+
+<nav>
+<button onclick="show('home')">Home</button>
+<button onclick="show('patients')">Patients</button>
+<button onclick="show('operations')">Operations</button>
+</nav>
+
+<section id="home" class="panel active">
+<h2>Welcome to PULSE OR</h2>
+<p>Hospital Operations Management</p>
+<div class="actions">
+<button onclick="show('newpatient')">+ New Patient</button>
+<button class="secondary" onclick="show('newoperation')">+ New Operation</button>
+</div>
+</section>
+
+<section id="patients" class="panel">
+<h2>Patient Records</h2>
+<input id="search" placeholder="Search patient..." oninput="render()">
+<div id="patientlist"></div>
+</section>
+
+<section id="newpatient" class="panel">
+<h2>New Patient</h2>
+<label>Full Name</label>
+<input id="name" placeholder="Patient name">
+<label>Medical Record Number</label>
+<input id="mrn" placeholder="Record number">
+<label>Date of Birth</label>
+<input id="dob" type="date">
+<label>Phone</label>
+<input id="phone" placeholder="Phone">
+<button onclick="addPatient()">Save Patient</button>
+</section>
+
+<section id="operations" class="panel">
+<h2>Operations Records</h2>
+<div id="operationlist"></div>
+</section>
+
+<section id="newoperation" class="panel">
+<h2>New Operation</h2>
+<label>Patient</label>
+<select id="patientselect"></select>
+<label>Operation Name</label>
+<input id="opname" placeholder="Operation name">
+<label>Surgeon</label>
+<input id="surgeon" placeholder="Surgeon name">
+<label>Anesthesiologist</label>
+<input id="anesth" placeholder="Anesthesiologist">
+<label>Anesthesia Type</label>
+<select id="atype">
+<option>General</option>
+<option>Spinal</option>
+<option>Local</option>
+<option>Regional</option>
+<option>Other</option>
+</select>
+<label>Operation Date</label>
+<input id="opdate" type="date">
+<button onclick="addOperation()">Save Operation</button>
+</section>
+
+<footer> PULSE OR © 2026 — DESIGN PULSE </footer>
+</main>
+
+<script>
+let patients=[];
+let operations=[];
+
+function show(id){
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(id==='newoperation') fillPatients();
+render();
+}
+
+function addPatient(){
+let name=document.getElementById('name').value.trim();
+if(!name){alert('Enter patient name');return}
+patients.push({
+id:'P-'+Date.now(),
+name,
+mrn:document.getElementById('mrn').value,
+dob:document.getElementById('dob').value,
+phone:document.getElementById('phone').value
+});
+document.getElementById('name').value='';
+document.getElementById('mrn').value='';
+document.getElementById('dob').value='';
+document.getElementById('phone').value='';
+show('patients');
+}
+
+function fillPatients(){
+let s=document.getElementById('patientselect');
+s.innerHTML='';
+patients.forEach(p=>{
+let o=document.createElement('option');
+o.value=p.id;
+o.textContent=p.name;
+s.appendChild(o);
+});
+}
+
+function addOperation(){
+let patient=patients.find(p=>p.id===document.getElementById('patientselect').value);
+if(!patient){alert('Add a patient first');return}
+let name=document.getElementById('opname').value.trim();
+if(!name){alert('Enter operation name');return}
+operations.push({
+id:'O-'+Date.now(),
+patient:patient.name,
+name,
+surgeon:document.getElementById('surgeon').value,
+anesth:document.getElementById('anesth').value,
+type:document.getElementById('atype').value,
+date:document.getElementById('opdate').value
+});
+document.getElementById('opname').value='';
+show('operations');
+}
+
+function render(){
+document.getElementById('pc').textContent=patients.length;
+document.getElementById('oc').textContent=operations.length;
+let q=(document.getElementById('search')?.value||'').toLowerCase();
+document.getElementById('patientlist').innerHTML=patients
+.filter(p=>(p.name+' '+p.mrn).toLowerCase().includes(q))
+.map(p=>`<div class="patient"><b>${safe(p.name)}</b><br>MRN: ${safe(p.mrn)}</div>`).join('')||'No patients';
+document.getElementById('operationlist').innerHTML=operations
+.map(o=>`<div class="operation"><b>${safe(o.name)}</b><br>Patient: ${safe(o.patient)}<br>Surgeon: ${safe(o.surgeon)}<br>Date: ${safe(o.date)}</div>`).join('')||'No operations';
+}
+
+function safe(v){
+return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+render();
+</script>
+</body>
+</html>
+
